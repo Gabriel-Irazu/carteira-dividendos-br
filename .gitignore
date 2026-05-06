@@ -1,0 +1,18 @@
+# Ambiente
+.env
+__pycache__/
+*.pyc
+*.pyo
+.python-version
+
+# Dados sensíveis / locais
+posicoes.csv
+
+# Gerados em runtime
+relatorio_preview.html
+streamlit_out.txt
+streamlit_err.txt
+
+# IDEs
+.vscode/
+.idea/
