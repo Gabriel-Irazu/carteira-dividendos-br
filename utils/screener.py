@@ -353,11 +353,10 @@ def build_detail_html(ticker: str, d: Dict[str, str], asset: dict) -> str:
             css = "bb-value-neg"
         else:
             css = "bb-value"
-        return f"""
-        <div class="bb-metric">
-          <span class="bb-label">{label}</span>
-          <span class="{css}">{fmt_val}</span>
-        </div>"""
+        return (f'<div class="bb-metric">'
+                f'<span class="bb-label">{label}</span>'
+                f'<span class="{css}">{fmt_val}</span>'
+                f'</div>')
 
     valuation_html = (
         metric("P/L",         g("P/L"))
@@ -404,49 +403,39 @@ def build_detail_html(ticker: str, d: Dict[str, str], asset: dict) -> str:
         if subsetor and subsetor != "—" else ""
     )
 
-    return f"""
-<div class="bb-terminal">
-  <div class="bb-detail-header">
-    <div style="margin-bottom:6px">
-      <span class="bb-ticker-tag">{ticker}</span>
-      <span class="bb-equity-label">&nbsp;&lt;EQUITY&gt;</span>
-      <span style="color:#555; margin:0 8px">|</span>
-      <span style="color:#FFFFFF; font-weight:bold">{empresa}</span>
-      <span style="color:#555; margin:0 8px">|</span>
-      <span style="color:#888">{setor}</span>
-      {subsetor_html}
-    </div>
-    <div style="display:flex; align-items:baseline; gap:20px; flex-wrap:wrap">
-      <span class="bb-price">R$ {cotacao_fmt}</span>
-      <span class="bb-meta">MIN 52s {min52} &nbsp;|&nbsp; MAX 52s {max52}</span>
-      <span class="bb-meta">VOL MÉD {volume}</span>
-      <span class="bb-meta">MKTCAP {mktcap}</span>
-    </div>
-    <div style="margin-top:6px; font-size:10px; color:#888">
-      DY: <span class="bb-pos">{g("Div. Yield")}</span>
-      &nbsp;|&nbsp; Nota Seg: <span style="color:#FF8C00">{asset["nota_seguranca"]}/10</span>
-      &nbsp;|&nbsp; Risco: <span class="{risco_css}">{asset["risco_corte"]}</span>
-      &nbsp;|&nbsp; Payout: {asset["payout"]*100:.0f}%
-      &nbsp;|&nbsp; Anos cresc.: {asset["anos_crescimento"]}
-    </div>
-  </div>
-
-  <div class="bb-grid">
-    <div>
-      <div class="bb-section-title">VALUATION</div>
-      {valuation_html}
-    </div>
-    <div>
-      <div class="bb-section-title">RENTABILIDADE</div>
-      {rentab_html}
-    </div>
-    <div>
-      <div class="bb-section-title">BALANÇO / ENDIVIDAMENTO</div>
-      {endiv_html}
-    </div>
-  </div>
-</div>
-"""
+    return (
+        f'<div class="bb-terminal">'
+        f'<div class="bb-detail-header">'
+        f'<div style="margin-bottom:6px">'
+        f'<span class="bb-ticker-tag">{ticker}</span>'
+        f'<span class="bb-equity-label">&nbsp;&lt;EQUITY&gt;</span>'
+        f'<span style="color:#555;margin:0 8px">|</span>'
+        f'<span style="color:#FFFFFF;font-weight:bold">{empresa}</span>'
+        f'<span style="color:#555;margin:0 8px">|</span>'
+        f'<span style="color:#888">{setor}</span>'
+        f'{subsetor_html}'
+        f'</div>'
+        f'<div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap">'
+        f'<span class="bb-price">R$ {cotacao_fmt}</span>'
+        f'<span class="bb-meta">MIN 52s {min52} &nbsp;|&nbsp; MAX 52s {max52}</span>'
+        f'<span class="bb-meta">VOL M&#201;D {volume}</span>'
+        f'<span class="bb-meta">MKTCAP {mktcap}</span>'
+        f'</div>'
+        f'<div style="margin-top:6px;font-size:10px;color:#888">'
+        f'DY: <span class="bb-pos">{g("Div. Yield")}</span>'
+        f'&nbsp;|&nbsp; Nota Seg: <span style="color:#FF8C00">{asset["nota_seguranca"]}/10</span>'
+        f'&nbsp;|&nbsp; Risco: <span class="{risco_css}">{asset["risco_corte"]}</span>'
+        f'&nbsp;|&nbsp; Payout: {asset["payout"]*100:.0f}%'
+        f'&nbsp;|&nbsp; Anos cresc.: {asset["anos_crescimento"]}'
+        f'</div>'
+        f'</div>'
+        f'<div class="bb-grid">'
+        f'<div><div class="bb-section-title">VALUATION</div>{valuation_html}</div>'
+        f'<div><div class="bb-section-title">RENTABILIDADE</div>{rentab_html}</div>'
+        f'<div><div class="bb-section-title">BALAN&#199;O / ENDIVIDAMENTO</div>{endiv_html}</div>'
+        f'</div>'
+        f'</div>'
+    )
 
 
 def build_screener_html(df: pd.DataFrame, selected: str) -> str:
