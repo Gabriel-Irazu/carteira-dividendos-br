@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w * http://localhost:*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"cd 'C:\\Users\\Gabriel\\Documents\\Python Scripts\\Carteira Dividendos'; if (git status --porcelain) { git add -A; git commit -m \\\"auto: $(Get-Date -Format 'yyyy-MM-dd HH:mm')\\\"; git push }\""
+          }
+        ]
+      }
+    ]
+  }
+}

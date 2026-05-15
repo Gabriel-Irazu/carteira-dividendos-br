@@ -25,6 +25,19 @@ Two entrypoints over a shared data/utils layer:
 3. `utils/calculators.py` — pure functions: `portfolio_weighted_dy`, `effective_dy` (applies 15% JCP tax), `gap_analysis`, `simulate_drip` (monthly DRIP loop), `years_to_reach_goal`, `compute_rebalancing` (drift-threshold logic), `income_sensitivity_table`.
 4. `utils/formatters.py` — `brl()`, `pct()`, Pandas `.style.map()` color helpers (`color_risco`, `color_operacao`), `TRIB_LABEL` dict.
 
+## GitHub e auto-commit
+
+Repositório: **https://github.com/Gabriel-Irazu/carteira-dividendos-br**
+
+O projeto usa um hook de Stop do Claude Code (`.claude/settings.json`) que detecta mudanças e faz `git add -A && git commit && git push` automaticamente ao final de cada resposta. Não é necessário commitar manualmente após edições feitas pelo Claude.
+
+Para commitar mudanças manuais (fora do Claude):
+```bash
+git add -A
+git commit -m "mensagem"
+git push
+```
+
 ## Key constraints
 
 - **Python 3.9** — use `Optional[X]` from `typing`, not `X | None`.
