@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 from config import (
     MONTHLY_INCOME_GOAL, INITIAL_CAPITAL, DRIP_YEARS,
-    DIVIDEND_GROWTH_RATE, REBAL_DRIFT_THRESHOLD, JCP_TAX_RATE,
+    DIVIDEND_GROWTH_RATE, REBAL_DRIFT_THRESHOLD, JCP_TAX_RATE, SELIC_RATE,
 )
 from data.portfolio import PORTFOLIO
 from utils.calculators import (
@@ -17,8 +17,9 @@ from utils.formatters import brl, pct, color_risco, color_operacao, nota_stars, 
 from utils.screener import (
     get_fundamentus_detalhes, get_price_history, add_indicators,
     build_screener_df, build_bloomberg_chart,
-    build_detail_html, build_screener_html, BLOOMBERG_CSS,
+    build_screener_html, BLOOMBERG_CSS,
 )
+from utils.dcf import get_financials, compute_dcf, build_dcf_html
 
 st.set_page_config(
     page_title="Carteira Dividendos BR",
@@ -655,28 +656,51 @@ with tabs[7]:
 
     st.divider()
 
-    # ── Detail view ────────────────────────────────────────────────────────────
     asset_obj = next((a for a in PORTFOLIO if a["ticker"] == selected_ticker), PORTFOLIO[0])
     fund_data = st.session_state.bb_fund_data.get(selected_ticker, {})
-
     if "_error" in fund_data:
-        st.warning(f"Erro ao buscar dados do Fundamentus para {selected_ticker}: {fund_data['_error']}")
         fund_data = {}
 
-    if fund_data:
-        st.markdown(
-            build_detail_html(selected_ticker, fund_data, asset_obj),
-            unsafe_allow_html=True,
+    # ── DCF Analysis ───────────────────────────────────────────────────────────
+    st.markdown(
+        f'<div class="bb-bar">ANÁLISE DCF &nbsp;|&nbsp; {selected_ticker} &nbsp;|&nbsp; '
+        f'DISCOUNTED CASH FLOW</div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("⚙️ Premissas do modelo DCF", expanded=False):
+        dcf_col1, dcf_col2, dcf_col3 = st.columns(3)
+        with dcf_col1:
+            g1 = st.slider("Cresc. receita Y1-Y3 (%)", 0.0, 30.0, 8.0, 0.5, key="dcf_g1") / 100
+            g2 = st.slider("Cresc. receita Y4-Y5 (%)", 0.0, 20.0, 5.0, 0.5, key="dcf_g2") / 100
+        with dcf_col2:
+            tg = st.slider("Crescimento terminal (%)", 1.0, 6.0, 3.0, 0.5, key="dcf_tg") / 100
+            em = st.slider("Exit multiple EV/EBITDA", 6.0, 20.0, 12.0, 0.5, key="dcf_em")
+        with dcf_col3:
+            use_wacc = st.checkbox("Sobrescrever WACC", value=False, key="dcf_wacc_chk")
+            wacc_input = st.slider("WACC manual (%)", 8.0, 30.0, 13.0, 0.5, key="dcf_wacc") / 100
+            wacc_override = wacc_input if use_wacc else None
+
+    with st.spinner(f"Calculando DCF para {selected_ticker}..."):
+        fin = get_financials(selected_ticker)
+        dcf_result = compute_dcf(
+            selected_ticker, asset_obj, fin, fund_data,
+            rf=SELIC_RATE,
+            growth_y1_y3=g1, growth_y4_y5=g2,
+            terminal_growth=tg, exit_multiple=em,
+            wacc_override=wacc_override,
         )
-    else:
+
+    if "_error" in dcf_result:
         st.markdown(
-            f'<div class="bb-terminal" style="padding:16px">'
-            f'<span style="color:#888; font-family:Courier New; font-size:11px">'
-            f'Carregue os dados do Fundamentus para ver os indicadores detalhados de '
-            f'<strong style="color:#FF8C00">{selected_ticker}</strong>.'
+            f'<div class="bb-terminal" style="padding:14px">'
+            f'<span style="color:#FF4444;font-family:Courier New;font-size:11px">'
+            f'⚠ DCF indisponível para {selected_ticker}: {dcf_result["_error"]}'
             f'</span></div>',
             unsafe_allow_html=True,
         )
+    else:
+        st.markdown(build_dcf_html(dcf_result), unsafe_allow_html=True)
 
     # ── Price chart ────────────────────────────────────────────────────────────
     st.markdown(
@@ -691,8 +715,8 @@ with tabs[7]:
 
     if hist_df.empty:
         st.markdown(
-            '<span style="color:#FF4444; font-family:Courier New; font-size:11px">'
-            '⚠ Histórico de preços não disponível para este ativo.</span>',
+            '<span style="color:#FF4444;font-family:Courier New;font-size:11px">'
+            '&#9888; Histórico de preços não disponível para este ativo.</span>',
             unsafe_allow_html=True,
         )
     else:
