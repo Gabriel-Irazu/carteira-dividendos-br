@@ -40,14 +40,13 @@ def get_fundamentus_detalhes(ticker: str) -> Dict[str, str]:
     url = FUNDAMENTUS_URL.format(ticker)
     try:
         r = requests.get(url, headers=_HEADERS, timeout=15)
-        r.encoding = "iso-8859-1"
-        soup = BeautifulSoup(r.text, "lxml")
+        soup = BeautifulSoup(r.content.decode("iso-8859-1"), "html.parser")
         data: Dict[str, str] = {}
-        for table in soup.find_all("table", class_="w100"):
+        for table in soup.find_all("table", class_="w728"):
             for row in table.find_all("tr"):
                 cells = row.find_all("td")
                 for i in range(0, len(cells) - 1, 2):
-                    label = cells[i].get_text(strip=True).rstrip("?").strip()
+                    label = cells[i].get_text(strip=True).strip("?").strip()
                     value = cells[i + 1].get_text(strip=True)
                     if label:
                         data[label] = value

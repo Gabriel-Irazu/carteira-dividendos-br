@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\Gabriel\\\\Documents\\\\Python Scripts\\\\Carteira Dividendos\\\\utils\\\\screener.py\" \"C:\\\\Users\\\\Gabriel\\\\OneDrive\\\\Documentos\\\\Python Scripts\\\\Carteira Dividendos\\\\utils\\\\screener.py\" -Force)"
+    ]
+  }
+}
