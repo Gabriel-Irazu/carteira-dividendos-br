@@ -14,6 +14,11 @@ from utils.calculators import (
     years_to_reach_goal, compute_rebalancing, income_sensitivity_table,
 )
 from utils.formatters import brl, pct, color_risco, color_operacao, nota_stars, TRIB_LABEL
+from utils.screener import (
+    get_fundamentus_detalhes, get_price_history, add_indicators,
+    build_screener_df, build_bloomberg_chart,
+    build_detail_html, build_screener_html, BLOOMBERG_CSS,
+)
 
 st.set_page_config(
     page_title="Carteira Dividendos BR",
@@ -76,6 +81,7 @@ tabs = st.tabs([
     "🥧 Diversificação",
     "🧾 Tributação",
     "⚖️ Rebalanceamento",
+    "📡 Screener",
 ])
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -569,3 +575,127 @@ with tabs[6]:
     )
     fig_drift.update_layout(xaxis_tickformat=".1%")
     st.plotly_chart(fig_drift, use_container_width=True)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TAB 8 — BLOOMBERG SCREENER
+# ═══════════════════════════════════════════════════════════════════════════════
+with tabs[7]:
+    from datetime import datetime
+
+    st.markdown(BLOOMBERG_CSS, unsafe_allow_html=True)
+
+    now_str = datetime.now().strftime("%d %b %Y  %H:%M").upper()
+    st.markdown(
+        f'<div class="bb-bar">BLOOMBERG EQUITY SCREENER &nbsp;|&nbsp; '
+        f'BRASIL &nbsp;|&nbsp; {len(PORTFOLIO)} ATIVOS &nbsp;|&nbsp; {now_str}</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Session state ──────────────────────────────────────────────────────────
+    if "bb_fund_data" not in st.session_state:
+        st.session_state.bb_fund_data = {}          # ticker → fundamentus dict
+    if "bb_selected" not in st.session_state:
+        st.session_state.bb_selected = PORTFOLIO[0]["ticker"]
+
+    # ── Controls bar ───────────────────────────────────────────────────────────
+    col_btn, col_sel, col_info = st.columns([2, 3, 3])
+
+    with col_btn:
+        load_btn = st.button(
+            "⚡ Carregar dados Fundamentus",
+            help="Busca P/L, P/VP, ROE, margens e mais para os 18 ativos (cache 1h)",
+        )
+
+    tickers_list = [a["ticker"] for a in PORTFOLIO]
+    with col_sel:
+        selected_ticker = st.selectbox(
+            "Selecionar ativo para análise detalhada:",
+            tickers_list,
+            index=tickers_list.index(st.session_state.bb_selected),
+            key="bb_sel_box",
+        )
+        st.session_state.bb_selected = selected_ticker
+
+    loaded_count = len(st.session_state.bb_fund_data)
+    with col_info:
+        if loaded_count == 0:
+            st.markdown(
+                '<span style="color:#888; font-family:Courier New; font-size:11px">'
+                '⚠ Dados Fundamentus não carregados — mostrando carteira local</span>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f'<span style="color:#00FF41; font-family:Courier New; font-size:11px">'
+                f'✔ {loaded_count}/{len(PORTFOLIO)} ativos carregados do Fundamentus</span>',
+                unsafe_allow_html=True,
+            )
+
+    # ── Load fundamentus data ──────────────────────────────────────────────────
+    if load_btn:
+        progress = st.progress(0, text="Conectando ao Fundamentus...")
+        for idx, a in enumerate(PORTFOLIO):
+            t = a["ticker"]
+            progress.progress(
+                (idx + 1) / len(PORTFOLIO),
+                text=f"Buscando {t}... ({idx+1}/{len(PORTFOLIO)})",
+            )
+            if t not in st.session_state.bb_fund_data:
+                st.session_state.bb_fund_data[t] = get_fundamentus_detalhes(t)
+        progress.empty()
+        st.rerun()
+
+    # ── Screener table ─────────────────────────────────────────────────────────
+    screener_df = build_screener_df(PORTFOLIO, st.session_state.bb_fund_data or None)
+    st.markdown(
+        build_screener_html(screener_df, st.session_state.bb_selected),
+        unsafe_allow_html=True,
+    )
+    st.caption("Clique no ticker desejado no seletor acima para ver a análise detalhada.")
+
+    st.divider()
+
+    # ── Detail view ────────────────────────────────────────────────────────────
+    asset_obj = next((a for a in PORTFOLIO if a["ticker"] == selected_ticker), PORTFOLIO[0])
+    fund_data = st.session_state.bb_fund_data.get(selected_ticker, {})
+
+    if "_error" in fund_data:
+        st.warning(f"Erro ao buscar dados do Fundamentus para {selected_ticker}: {fund_data['_error']}")
+        fund_data = {}
+
+    if fund_data:
+        st.markdown(
+            build_detail_html(selected_ticker, fund_data, asset_obj),
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            f'<div class="bb-terminal" style="padding:16px">'
+            f'<span style="color:#888; font-family:Courier New; font-size:11px">'
+            f'Carregue os dados do Fundamentus para ver os indicadores detalhados de '
+            f'<strong style="color:#FF8C00">{selected_ticker}</strong>.'
+            f'</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Price chart ────────────────────────────────────────────────────────────
+    st.markdown(
+        f'<div class="bb-bar" style="margin-top:12px">'
+        f'HISTÓRICO DE COTAÇÃO &nbsp;|&nbsp; {selected_ticker} &nbsp;|&nbsp; 1 ANO &nbsp;|&nbsp; '
+        f'MACD · RSI · BOLLINGER</div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.spinner(f"Buscando histórico de {selected_ticker}..."):
+        hist_df = get_price_history(selected_ticker)
+
+    if hist_df.empty:
+        st.markdown(
+            '<span style="color:#FF4444; font-family:Courier New; font-size:11px">'
+            '⚠ Histórico de preços não disponível para este ativo.</span>',
+            unsafe_allow_html=True,
+        )
+    else:
+        hist_df = add_indicators(hist_df)
+        fig_bb = build_bloomberg_chart(hist_df, selected_ticker)
+        st.plotly_chart(fig_bb, use_container_width=True)
