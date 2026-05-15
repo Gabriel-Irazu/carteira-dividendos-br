@@ -222,10 +222,10 @@ BLOOMBERG_CSS = """
     background: #FF8C00;
     color: #000000;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     letter-spacing: 2px;
-    padding: 5px 12px;
+    padding: 6px 14px;
     margin-bottom: 10px;
 }
 .bb-terminal {
@@ -233,7 +233,7 @@ BLOOMBERG_CSS = """
     border: 1px solid #FF8C00;
     font-family: 'Courier New', Courier, monospace;
     color: #E0E0E0;
-    padding: 14px 16px;
+    padding: 16px 18px;
     margin-bottom: 12px;
 }
 .bb-detail-header {
@@ -245,27 +245,27 @@ BLOOMBERG_CSS = """
     background: #FF8C00;
     color: #000;
     font-weight: bold;
-    font-size: 14px;
-    padding: 2px 8px;
+    font-size: 16px;
+    padding: 2px 10px;
     letter-spacing: 1px;
 }
 .bb-equity-label {
     color: #FF8C00;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: bold;
     letter-spacing: 1px;
 }
 .bb-price {
-    font-size: 26px;
+    font-size: 30px;
     font-weight: bold;
     color: #FFFFFF;
 }
 .bb-pos  { color: #00FF41; font-weight: bold; }
 .bb-neg  { color: #FF4444; font-weight: bold; }
-.bb-meta { color: #888888; font-size: 11px; }
+.bb-meta { color: #888888; font-size: 13px; }
 .bb-section-title {
     color: #FF8C00;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -281,30 +281,30 @@ BLOOMBERG_CSS = """
 .bb-metric {
     display: flex;
     justify-content: space-between;
-    padding: 2px 0;
+    padding: 3px 0;
     border-bottom: 1px solid #111;
 }
-.bb-label { color: #888888; font-size: 10px; }
-.bb-value { color: #FFFFFF;  font-size: 11px; font-weight: bold; }
-.bb-value-pos { color: #00FF41; font-size: 11px; font-weight: bold; }
-.bb-value-neg { color: #FF4444; font-size: 11px; font-weight: bold; }
+.bb-label { color: #888888; font-size: 12px; }
+.bb-value { color: #FFFFFF;  font-size: 13px; font-weight: bold; }
+.bb-value-pos { color: #00FF41; font-size: 13px; font-weight: bold; }
+.bb-value-neg { color: #FF4444; font-size: 13px; font-weight: bold; }
 .bb-table {
     width: 100%;
     border-collapse: collapse;
     font-family: 'Courier New', monospace;
-    font-size: 11px;
+    font-size: 13px;
 }
 .bb-table th {
     background: #FF8C00;
     color: #000000;
     font-weight: bold;
-    padding: 5px 8px;
+    padding: 6px 10px;
     text-align: left;
     letter-spacing: 1px;
-    font-size: 10px;
+    font-size: 12px;
 }
 .bb-table td {
-    padding: 4px 8px;
+    padding: 5px 10px;
     border-bottom: 1px solid #111;
     color: #E0E0E0;
 }
@@ -421,7 +421,7 @@ def build_detail_html(ticker: str, d: Dict[str, str], asset: dict) -> str:
         f'<span class="bb-meta">VOL M&#201;D {volume}</span>'
         f'<span class="bb-meta">MKTCAP {mktcap}</span>'
         f'</div>'
-        f'<div style="margin-top:6px;font-size:10px;color:#888">'
+        f'<div style="margin-top:6px;font-size:12px;color:#888">'
         f'DY: <span class="bb-pos">{g("Div. Yield")}</span>'
         f'&nbsp;|&nbsp; Nota Seg: <span style="color:#FF8C00">{asset["nota_seguranca"]}/10</span>'
         f'&nbsp;|&nbsp; Risco: <span class="{risco_css}">{asset["risco_corte"]}</span>'

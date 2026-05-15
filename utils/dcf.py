@@ -361,8 +361,8 @@ def build_dcf_html(r: Dict) -> str:
         return (
             f'<div style="display:flex;justify-content:space-between;'
             f'padding:3px 0;border-bottom:1px solid #111">'
-            f'<span style="color:#888;font-size:11px">{label}</span>'
-            f'<span style="color:{color};font-weight:{fw};font-size:11px">{val}</span>'
+            f'<span style="color:#888;font-size:13px">{label}</span>'
+            f'<span style="color:{color};font-weight:{fw};font-size:13px">{val}</span>'
             f'</div>'
         )
 
@@ -414,7 +414,7 @@ def build_dcf_html(r: Dict) -> str:
         f'<thead><tr><th>WACC \\ g</th>{g_headers}</tr></thead>'
         f'<tbody>{sens_rows}</tbody>'
         '</table>'
-        '<div style="font-size:10px;color:#555;margin-top:4px">'
+        '<div style="font-size:12px;color:#555;margin-top:4px">'
         '&#9646; Verde: &gt;15% upside | Amarelo: ±15% | Vermelho: &gt;15% downside'
         '</div></div>'
     )
@@ -424,10 +424,10 @@ def build_dcf_html(r: Dict) -> str:
     direction  = "abaixo" if r["up_avg"] > 0 else "acima"
     s_verdict = (
         f'<div style="border:2px solid #FF8C00;padding:14px;margin-bottom:10px;text-align:center">'
-        f'<div style="font-size:11px;color:#888;letter-spacing:2px;margin-bottom:6px">CONCLUSÃO DCF</div>'
-        f'<div style="font-size:22px;font-weight:bold" class="{r["vcls"]}">'
+        f'<div style="font-size:13px;color:#888;letter-spacing:2px;margin-bottom:6px">CONCLUSÃO DCF</div>'
+        f'<div style="font-size:24px;font-weight:bold" class="{r["vcls"]}">'
         f'{r["vemoji"]} {r["verdict"]}</div>'
-        f'<div style="margin-top:8px;font-size:12px;color:#E0E0E0">'
+        f'<div style="margin-top:8px;font-size:14px;color:#E0E0E0">'
         f'Preço atual: <strong style="color:#FFFFFF">{_brl(r["cur"])}</strong>'
         f'&nbsp;|&nbsp;'
         f'Valor justo médio: <strong style="color:#FF8C00">{_brl(r["fair_value"])}</strong>'
@@ -442,7 +442,7 @@ def build_dcf_html(r: Dict) -> str:
         for rk in r["risks"]
     )
     s_risks = (
-        f'<ul style="margin:0;padding-left:18px;font-size:11px;font-family:Courier New">'
+        f'<ul style="margin:0;padding-left:18px;font-size:13px;font-family:Courier New">'
         f'{risk_items}</ul>'
     )
 
@@ -470,8 +470,8 @@ def _kpi(label: str, value: str, highlight: bool = False) -> str:
     color = "#FF8C00" if highlight else "#FFFFFF"
     return (
         f'<div style="background:#0A1020;padding:8px;border:1px solid #1A2A3A">'
-        f'<div style="font-size:9px;color:#888;letter-spacing:1px;text-transform:uppercase">{label}</div>'
-        f'<div style="font-size:14px;font-weight:bold;color:{color};margin-top:2px">{value}</div>'
+        f'<div style="font-size:11px;color:#888;letter-spacing:1px;text-transform:uppercase">{label}</div>'
+        f'<div style="font-size:16px;font-weight:bold;color:{color};margin-top:2px">{value}</div>'
         f'</div>'
     )
 
@@ -482,6 +482,6 @@ def _updown_badge(pct_val: float) -> str:
     label = "vs preço atual"
     return (
         f'<span style="background:{color};color:#000;font-weight:bold;'
-        f'padding:3px 10px;font-size:12px;font-family:Courier New">'
+        f'padding:4px 12px;font-size:14px;font-family:Courier New">'
         f'{sign}{pct_val*100:.1f}% {label}</span>'
     )
