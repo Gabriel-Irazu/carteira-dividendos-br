@@ -31,6 +31,14 @@ def nota_stars(nota: int) -> str:
     return filled + empty
 
 
+def style_map(styler, func, subset=None):
+    """Apply element-wise style — handles Styler.map (pandas ≥2.1) and applymap (pandas <2.1)."""
+    try:
+        return styler.map(func, subset=subset)
+    except AttributeError:
+        return styler.applymap(func, subset=subset)
+
+
 TRIB_LABEL = {
     "isento_pf":  "Isento PF",
     "jcp_15":     "JCP 15% fonte",

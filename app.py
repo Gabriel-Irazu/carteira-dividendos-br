@@ -13,7 +13,7 @@ from utils.calculators import (
     capital_for_goal, gap_analysis, simulate_drip,
     years_to_reach_goal, compute_rebalancing, income_sensitivity_table,
 )
-from utils.formatters import brl, pct, color_risco, color_operacao, nota_stars, TRIB_LABEL
+from utils.formatters import brl, pct, color_risco, color_operacao, nota_stars, TRIB_LABEL, style_map
 from utils.screener import (
     get_fundamentus_detalhes, get_price_history, add_indicators,
     build_screener_df, build_bloomberg_chart,
@@ -123,7 +123,7 @@ with tabs[0]:
     disp["Payout"]     = disp["Payout"].apply(pct)
     disp["Peso Alvo"]  = disp["Peso Alvo"].apply(pct)
 
-    styled = disp.style.map(color_risco, subset=["Risco Corte"])
+    styled = style_map(disp.style, color_risco, subset=["Risco Corte"])
     st.dataframe(styled, use_container_width=True, hide_index=True, height=660)
 
     st.caption("Ranking: 1 = mais defensivo (WEGE3 com 12 anos de crescimento de dividendos) → 18 = mais agressivo")
@@ -535,7 +535,7 @@ with tabs[6]:
     disp_rebal["Valor Atual"] = disp_rebal["Valor Atual"].apply(brl)
     disp_rebal["Diferença"]   = rebal_df["Diferença"].apply(lambda x: f"+{brl(x)}" if x >= 0 else f"-{brl(abs(x))}")
 
-    styled_rebal = disp_rebal.style.map(color_operacao, subset=["Operação"])
+    styled_rebal = style_map(disp_rebal.style, color_operacao, subset=["Operação"])
     st.dataframe(styled_rebal, hide_index=True, use_container_width=True)
 
     # Summary
